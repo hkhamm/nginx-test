@@ -1,0 +1,47 @@
+---
+
+- name: Updating apt cache and installing python
+  apt: name=python state=latest update_cache=yes
+
+- name: Installing pip
+  apt: name=python-pip state=latest
+
+- name: Installing python-dev
+  apt: name=python-dev state=latest
+
+- name: Installing virtualenv
+  pip: name=virtualenv
+
+- name: Installing django
+  pip: name=django
+
+- name: Setting up a django project
+  shell: django-admin.py startproject mysite
+
+- name: Installing uwsgi
+  pip: name=uwsgi
+
+- name: Setting up uwsgi_params
+  copy: src=uwsgi_params dest=/home/vagrant/mysite
+
+- name: Installing nginx
+  apt: name=nginx state=latest
+
+- name: Setting up mysite_nginx.conf
+  copy: src=mysite_nginx.conf dest=/home/vagrant/mysite
+
+- name: Linking mysite_nginx.conf
+  file: src=/home/vagrant/mysite/mysite_nginx.conf
+        dest=/etc/nginx/sites-enabled/mysite_nginx.conf state=link
+
+- name: Editing settings.py
+  shell: echo 'STATIC_ROOT = os.path.join(BASE_DIR, "static/")' >> /home/vagrant/mysite/mysite/settings.py
+
+- name: Running collectstatic
+  shell: python /home/vagrant/mysite/manage.py collectstatic
+
+- name: Setting up test.py
+  copy: src=test.py dest=/home/vagrant/mysite
+
+- name: Start nginx
+  service: name=nginx state=restarted

@@ -1,0 +1,6 @@
+---
+- hosts: all
+  sudo: yes
+  tasks:
+  # Install nginx
+  - include: tasks/nginx.yml
