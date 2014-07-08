@@ -48,14 +48,18 @@
 - name: Setting up mysite_uwsgi.ini
   copy: src=mysite_uwsgi.ini dest=/home/vagrant/mysite
 
-- name: Start nginx
+- name: Creating directory for uwsgi
+  shell: mkdir /etc/uwsgi
+
+- name: Creating directory for vassals
+  shell: /etc/uwsgi/vassals
+
+- name: Linking mysite_uwsgi.ini
+  file: src=/home/vagrant/mysite/mysite_uwsgi.ini
+        dest=/etc/uwsgi/vassals/mysite_uwsgi.ini state=link
+
+- name: Starting nginx
   service: name=nginx state=restarted
 
-# Setup emperor mode
-# # create a directory for the vassals
-# sudo mkdir /etc/uwsgi
-# sudo mkdir /etc/uwsgi/vassals
-# # symlink from the default config directory to your config file
-# sudo ln -s /path/to/your/mysite/mysite_uwsgi.ini /etc/uwsgi/vassals/
 # # run the emperor
 # sudo uwsgi --emperor /etc/uwsgi/vassals --uid root --gid root
